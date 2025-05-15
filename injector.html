@@ -2,12 +2,99 @@
 <html>
 <head>
     <title>Supersearcher Launcher</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        #controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 600px;
+        }
+
+        input, button {
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        input {
+            width: 100%;
+        }
+
+        button {
+            width: fit-content;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .row > * {
+            flex: 1;
+        }
+    </style>
 </head>
 <body>
-    <h2>Launch Supersearcher</h2>
-    <button onclick="launchSupersearcher()">Launch in about:blank</button>
+    <h2>Supersearcher Launcher</h2>
+
+    <div id="controls">
+        <div>
+            <label for="customUrl">Inject a Custom URL into a new tab:</label>
+            <input type="text" id="customUrl" placeholder="https://example.com" />
+        </div>
+        <div class="row">
+            <button onclick="injectCustom()">Inject Custom Page</button>
+            <button onclick="launchSupersearcher()">Launch Supersearcher</button>
+        </div>
+    </div>
 
     <script>
+        function injectCustom() {
+            const url = document.getElementById("customUrl").value.trim();
+            if (!url || !/^https?:\/\//.test(url)) {
+                alert("Please enter a valid full URL (starting with http:// or https://)");
+                return;
+            }
+
+            const win = window.open("about:blank");
+
+            if (!win) {
+                alert("Popup blocked. Please allow popups and try again.");
+                return;
+            }
+
+            win.document.open();
+            win.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Injected Page</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <iframe src="${url}" allowfullscreen></iframe>
+</body>
+</html>
+            `);
+            win.document.close();
+        }
+
         function launchSupersearcher() {
             const win = window.open("about:blank");
 
@@ -27,25 +114,34 @@
             height: 100%;
             margin: 0;
             padding: 0;
+            font-family: sans-serif;
         }
         center {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            padding: 10px;
         }
         iframe#frame {
             height: 95vh;
             width: 95vw;
             border: none;
-            padding: 1px;
             border-radius: 8px;
         }
         button, input {
-            border-radius: 4px;
+            border-radius: 6px;
+            padding: 6px;
+            font-size: 1rem;
         }
-        input#searchfield {
+        #searchfield {
             width: 50vw;
+        }
+        .button-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
         }
     </style>
     <script>
@@ -78,19 +174,18 @@
     <div id="page">
         <center>
             <iframe allowfullscreen src="https://sugarylettuce49.github.io/SuperSearcher/wow.html" id="frame"></iframe>
-            <div>
-                <button onclick="document.getElementById('frame').src = 'https://sugarylettuce49.github.io/SuperSearcher/wow.html'" style="width:10%">Home</button>
-                <button onclick="toolsMenu()" style="width:10%">Tools</button>
+            <div class="button-bar">
+                <button onclick="document.getElementById('frame').src = 'https://sugarylettuce49.github.io/SuperSearcher/wow.html'">Home</button>
+                <button onclick="toolsMenu()">Tools</button>
                 <input type="text" id="searchfield" value="https://" />
-                <button onclick="search()" style="width:5%">Go</button>
-                <button onclick="fllscrn()" style="width:18%">Fullscreen Webpage</button>
+                <button onclick="search()">Go</button>
+                <button onclick="fllscrn()">Fullscreen Webpage</button>
             </div>
         </center>
     </div>
 </body>
 </html>
 `;
-
             win.document.open();
             win.document.write(htmlContent);
             win.document.close();
