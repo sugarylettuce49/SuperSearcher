@@ -1,195 +1,264 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Supersearcher Launcher</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Supersearcher Local Injector</title>
+<base target="_parent" />
+<style>
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: sans-serif;
+    background: #f5f5f5;
+  }
+  #page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  #viewer-container {
+    width: 95vw;
+    height: 80vh;
+    border-radius: 8px;
+    background: white;
+    overflow: hidden;
+  }
+  #viewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  #controls {
+    margin-top: 10px;
+    width: 95vw;
+    max-width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  #controls button,
+  #controls input[type="text"] {
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+  #controls input[type="text"] {
+    flex-grow: 1;
+    min-width: 250px;
+  }
+  #controls button {
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  #btnHome { width: 80px; }
+  #btnTools { width: 80px; }
+  #btnGo { width: 50px; }
+  #btnFullscreen { width: 140px; }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const page = document.getElementById('page');
+    const viewerContainer = document.getElementById('viewer-container');
 
-        #controls {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 600px;
-        }
+    function requestFullScreen() {
+      if (page.requestFullscreen) {
+        page.requestFullscreen();
+      } else if (page.webkitRequestFullscreen) {
+        page.webkitRequestFullscreen();
+      } else if (page.msRequestFullscreen) {
+        page.msRequestFullscreen();
+      }
+    }
 
-        input, button {
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
+    function setSrc(url) {
+      // Clear and add <object> with new src
+      viewerContainer.innerHTML = '';
+      const obj = document.createElement('object');
+      obj.id = 'viewer';
+      obj.type = 'text/html';
+      obj.data = url;
+      obj.setAttribute('allowfullscreen', '');
+      obj.style.border = 'none';
+      obj.style.width = '100%';
+      obj.style.height = '100%';
+      viewerContainer.appendChild(obj);
+    }
 
-        input {
-            width: 100%;
-        }
+    window.fllscrn = () => {
+      requestFullScreen();
+    };
 
-        button {
-            width: fit-content;
-        }
+    window.search = () => {
+      const url = document.getElementById('searchfield').value.trim();
+      if (!url) return alert('Please enter a URL.');
+      setSrc(url);
+    };
 
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .row > * {
-            flex: 1;
-        }
-    </style>
-</head>
-<body>
-    <h2>Supersearcher Launcher</h2>
-
-    <div id="controls">
-        <div>
-            <label for="customUrl">Inject a Custom URL into a new tab:</label>
-            <input type="text" id="customUrl" placeholder="https://example.com" />
-        </div>
-        <div class="row">
-            <button onclick="injectCustom()">Inject Custom Page</button>
-            <button onclick="launchSupersearcher()">Launch Supersearcher</button>
-        </div>
-    </div>
-
-    <script>
-        function injectCustom() {
-            const url = document.getElementById("customUrl").value.trim();
-            if (!url || !/^https?:\/\//.test(url)) {
-                alert("Please enter a valid full URL (starting with http:// or https://)");
-                return;
+    window.newWin = () => {
+      const w = window.open('about:blank');
+      const injectedHTML = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <title>Supersearcher New Window</title>
+          <style>
+            html, body {
+              margin:0; padding:0; height:100%;
+              background:#f5f5f5;
+              font-family: sans-serif;
             }
-
-            const win = window.open("about:blank");
-
-            if (!win) {
-                alert("Popup blocked. Please allow popups and try again.");
-                return;
+            #page {
+              height: 100vh;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
             }
-
-            win.document.open();
-            win.document.write(`
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Injected Page</title>
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-        iframe {
-            border: none;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
-</head>
-<body>
-    <iframe src="${url}" allowfullscreen></iframe>
-</body>
-</html>
-            `);
-            win.document.close();
-        }
-
-        function launchSupersearcher() {
-            const win = window.open("about:blank");
-
-            if (!win) {
-                alert("Popup blocked. Please allow popups and try again.");
-                return;
+            #viewer-container {
+              width: 95vw;
+              height: 80vh;
+              border-radius: 8px;
+              background: white;
+              overflow: hidden;
             }
-
-            const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Supersearcher Local</title>
-    <base target="_parent">
-    <style>
-        html, body, #page {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: sans-serif;
-        }
-        center {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            padding: 10px;
-        }
-        iframe#frame {
-            height: 95vh;
-            width: 95vw;
-            border: none;
-            border-radius: 8px;
-        }
-        button, input {
-            border-radius: 6px;
-            padding: 6px;
-            font-size: 1rem;
-        }
-        #searchfield {
-            width: 50vw;
-        }
-        .button-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-        }
-    </style>
-    <script>
-        function fllscrn() {
-            document.getElementById("page").requestFullscreen();
-        }
-
-        function search() {
-            document.getElementById('frame').src = document.getElementById("searchfield").value;
-        }
-
-        function newWin() {
-            const w = window.open();
-            w.document.body.innerHTML = '<iframe allowfullscreen src="assets/wow.html" width="100%" height="100%" style="border:none;" id="frame">';
-        }
-
-        function toolsMenu() {
-            var option = prompt("Select an option\\n1: Show info\\n2: Use local wow page");
-            if (option == "1") {
-                alert("Version info: Super Searcher 2.5\\nBundled WOW version: 2.5\\nBy default, the wow page comes from an online source which is dynamically updated.");
-            } else if (option == "2") {
-                document.getElementById('frame').src = 'assets/wow.html';
-            } else {
-                alert("Invalid option");
+            #viewer {
+              width: 100%;
+              height: 100%;
+              border: none;
             }
-        }
-    <\/script>
-</head>
-<body>
-    <div id="page">
-        <center>
-            <iframe allowfullscreen src="https://sugarylettuce49.github.io/SuperSearcher/wow.html" id="frame"></iframe>
-            <div class="button-bar">
-                <button onclick="document.getElementById('frame').src = 'https://sugarylettuce49.github.io/SuperSearcher/wow.html'">Home</button>
-                <button onclick="toolsMenu()">Tools</button>
-                <input type="text" id="searchfield" value="https://" />
-                <button onclick="search()">Go</button>
-                <button onclick="fllscrn()">Fullscreen Webpage</button>
+            #controls {
+              margin-top: 10px;
+              width: 95vw;
+              max-width: 1200px;
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+              justify-content: center;
+            }
+            #controls button,
+            #controls input[type="text"] {
+              border-radius: 4px;
+              padding: 6px 12px;
+              font-size: 1rem;
+              box-sizing: border-box;
+            }
+            #controls input[type="text"] {
+              flex-grow: 1;
+              min-width: 250px;
+            }
+            #controls button {
+              flex-shrink: 0;
+              cursor: pointer;
+            }
+            #btnHome { width: 80px; }
+            #btnTools { width: 80px; }
+            #btnGo { width: 50px; }
+            #btnFullscreen { width: 140px; }
+          </style>
+        </head>
+        <body>
+          <div id="page">
+            <div id="viewer-container"></div>
+            <div id="controls">
+              <button id="btnHome">Home</button>
+              <button id="btnTools">Tools</button>
+              <input type="text" id="searchfield" value="https://" placeholder="Enter URL here" />
+              <button id="btnGo">Go</button>
+              <button id="btnFullscreen">Fullscreen Webpage</button>
             </div>
-        </center>
+          </div>
+          <script>
+            (function() {
+              const page = document.getElementById('page');
+              const viewerContainer = document.getElementById('viewer-container');
+
+              function requestFullScreen() {
+                if (page.requestFullscreen) {
+                  page.requestFullscreen();
+                } else if (page.webkitRequestFullscreen) {
+                  page.webkitRequestFullscreen();
+                } else if (page.msRequestFullscreen) {
+                  page.msRequestFullscreen();
+                }
+              }
+
+              function setSrc(url) {
+                viewerContainer.innerHTML = '';
+                const obj = document.createElement('object');
+                obj.id = 'viewer';
+                obj.type = 'text/html';
+                obj.data = url;
+                obj.setAttribute('allowfullscreen', '');
+                obj.style.border = 'none';
+                obj.style.width = '100%';
+                obj.style.height = '100%';
+                viewerContainer.appendChild(obj);
+              }
+
+              document.getElementById('btnHome').onclick = () => {
+                setSrc('https://sugarylettuce49.github.io/SuperSearcher/wow.html');
+                document.getElementById('searchfield').value = 'https://sugarylettuce49.github.io/SuperSearcher/wow.html';
+              };
+
+              document.getElementById('btnTools').onclick = () => {
+                const option = prompt("Select an option\\n1: Show info\\n2: Use local wow page");
+                if (option === "1") {
+                  alert("Version info: Super Searcher 2.5\\nBundled WOW version: 2.5\\nBy default, the wow page comes from an online source which is dynamically updated.");
+                } else if (option === "2") {
+                  setSrc('assets/wow.html');
+                  document.getElementById('searchfield').value = 'assets/wow.html';
+                } else {
+                  alert("Invalid option");
+                }
+              };
+
+              document.getElementById('btnGo').onclick = () => {
+                const url = document.getElementById('searchfield').value.trim();
+                if (!url) return alert('Please enter a URL.');
+                setSrc(url);
+              };
+
+              document.getElementById('btnFullscreen').onclick = () => {
+                requestFullScreen();
+              };
+
+              // Load initial page
+              setSrc('https://sugarylettuce49.github.io/SuperSearcher/wow.html');
+              document.getElementById('searchfield').value = 'https://sugarylettuce49.github.io/SuperSearcher/wow.html';
+
+            })();
+          </script>
+        </body>
+        </html>
+      `;
+      w.document.write(injectedHTML);
+      w.document.close();
+    };
+
+    // Initial load of the main page object
+    setSrc('https://sugarylettuce49.github.io/SuperSearcher/wow.html');
+
+    // Expose setSrc globally so Home button works outside
+    window.setSrc = setSrc;
+  });
+</script>
+</head>
+<body>
+  <div id="page">
+    <div id="viewer-container"></div>
+    <div id="controls">
+      <button id="btnHome" onclick="setSrc('https://sugarylettuce49.github.io/SuperSearcher/wow.html');document.getElementById('searchfield').value='https://sugarylettuce49.github.io/SuperSearcher/wow.html';">Home</button>
+      <button id="btnTools" onclick="toolsMenu()">Tools</button>
+      <input type="text" id="searchfield" value="https://" style="border-radius:4px; width:50%" placeholder="Enter URL here" />
+      <button id="btnGo" onclick="search()" style="border-radius:4px; width:5%">Go</button>
+      <button id="btnFullscreen" onclick="fllscrn()" style="border-radius:4px; width:18%">Fullscreen Webpage</button>
     </div>
-</body>
-</html>
-`;
-            win.document.open();
-            win.document.write(htmlContent);
-            win.document.close();
-        }
-    </script>
+  </div>
 </body>
 </html>
