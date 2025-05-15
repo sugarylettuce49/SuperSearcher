@@ -19,6 +19,20 @@
   <meta charset="UTF-8">
   <title>Supersearcher Alt API</title>
   <base target="_parent">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #page {
+      height: 100%;
+    }
+    object#frame {
+      height: 95vh;
+      width: 95vw;
+    }
+  </style>
   <script>
     alert("This is a version of supersearcher which uses a different api, if links do not properly load, please paste them into the search bar at the bottom and press go, you can also use this search bar if you know the exact url of the page you wish to visit.");
     alert("This is a version of supersearcher is less reliable for loading pages, however, it seems like blocking services have a harder time blocking this version.");
@@ -48,7 +62,7 @@
 <body>
   <div id="page">
     <center>
-      <object id="frame" type="text/html" data="https://sugarylettuce49.github.io/SuperSearcher/wow.html" width="95%" height="95%" style="border:none; padding: 1px; border-radius: 8px;"></object>
+      <object id="frame" type="text/html" data="https://sugarylettuce49.github.io/SuperSearcher/wow.html" style="border:none; padding: 1px; border-radius: 8px;"></object>
       <br>
       <button onclick="document.getElementById('frame').setAttribute('data','https://sugarylettuce49.github.io/SuperSearcher/wow.html');" style="border-radius: 4px; width:10%">Home</button>
       <button onclick="toolsMenu();" style="border-radius: 4px; width:10%">Tools</button>
