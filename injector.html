@@ -1,133 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Supersearcher Injector</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 1em;
-  }
-  input[type="text"] {
-    width: 60%;
-    border-radius: 4px;
-    padding: 6px;
-    font-size: 1em;
-  }
-  button {
-    border-radius: 4px;
-    padding: 6px 12px;
-    font-size: 1em;
-    margin-left: 8px;
-    cursor: pointer;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Inject Supersearcher</title>
 </head>
 <body>
-<h2>Supersearcher Injector</h2>
-<label for="urlInput">Enter URL to load:</label>
-<br/>
-<input id="urlInput" type="text" value="https://sugarylettuce49.github.io/SuperSearcher/wow.html" />
-<button id="injectBtn">Inject</button>
+  <button onclick="injectPage()">Open Supersearcher in about:blank</button>
 
-<script>
-  function injectSupersearcher(url) {
-    const newWindow = window.open('about:blank');
+  <script>
+    function injectPage() {
+      const newWin = window.open('about:blank');
+      const doc = newWin.document;
 
-    // Sanitize URL to avoid injection attacks (basic)
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      alert('Please enter a valid http:// or https:// URL');
-      newWindow.close();
-      return;
-    }
-
-    const injectedHTML = `
+      const htmlContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Supersearcher Local</title>
-<style>
-  html, body, #page {
-    margin: 0; padding: 0; height: 100%; width: 100%;
-    background: #fff;
-    font-family: Arial, sans-serif;
-  }
-  #page {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-  }
-  object#frame {
-    width: 95vw; 
-    height: 90vh; 
-    border: none; 
-    padding: 1px; 
-    border-radius: 8px;
-  }
-  button, input[type="text"] {
-    border-radius: 4px;
-    margin: 4px;
-    padding: 6px 10px;
-    font-size: 1em;
-  }
-  input[type="text"] {
-    width: 50vw;
-  }
-  #controls {
-    margin-top: 8px;
-  }
-</style>
-<script>
-  function setSrc(newSrc) {
-    document.getElementById('frame').data = newSrc;
-  }
-  function toolsMenu() {
-    var option = prompt("Select an option\\n1: Show info\\n2: Use local wow page");
-    if (option === "1") {
-      alert("Version info: Super Searcher 2.5\\nBundled WOW version: 2.5\\nBy default, the wow page comes from an online source which is dynamically updated.");
-    } else if (option === "2") {
-      setSrc('assets/wow.html');
-    } else {
-      alert("Invalid option");
+  <meta charset="UTF-8">
+  <title>Supersearcher Alt API</title>
+  <base target="_parent">
+  <script>
+    alert("This is a version of supersearcher which uses a different api, if links do not properly load, please paste them into the search bar at the bottom and press go, you can also use this search bar if you know the exact url of the page you wish to visit.");
+    alert("This is a version of supersearcher is less reliable for loading pages, however, it seems like blocking services have a harder time blocking this version.");
+    function fllscrn() {
+      document.getElementById("page").requestFullscreen();
     }
-  }
-  function fllscrn() {
-    const page = document.getElementById('page');
-    if (page.requestFullscreen) {
-      page.requestFullscreen();
-    } else if (page.webkitRequestFullscreen) { /* Safari */
-      page.webkitRequestFullscreen();
-    } else if (page.msRequestFullscreen) { /* IE11 */
-      page.msRequestFullscreen();
+    function search() {
+      let search = document.getElementById("searchfield").value;
+      document.getElementById('frame').setAttribute('data', search);
     }
-  }
-  window.onload = () => {
-    document.getElementById('searchfield').value = '${url.replace(/'/g,"\\'")}';
-  };
-</script>
+    function newWin() {
+      const w = window.open();
+      w.document.body.innerHTML = '<iframe allowfullscreen src="assets/wow.html" width="100%" height="100%" style="border:none;" id="frame">';
+    }
+    function toolsMenu() {
+      var option = prompt("Select an option\\n1: Show info\\n2: Use local wow page");
+      if (option == "1") {
+        alert("Version info: Super Searcher 2.5\\nBundled WOW version: 2.5\\nBy default, the wow page comes from an online source which is dynamically updated.");
+      } else if (option == "2") {
+        document.getElementById('frame').setAttribute('data','assets/wow.html');
+      } else {
+        alert("Invalid option");
+      }
+    }
+  <\/script>
 </head>
 <body>
-<div id="page">
-  <object id="frame" type="text/html" data="${url}" allowfullscreen></object>
-  <div id="controls">
-    <button onclick="setSrc('https://sugarylettuce49.github.io/SuperSearcher/wow.html')">Home</button>
-    <button onclick="toolsMenu()">Tools</button>
-    <input id="searchfield" type="text" value="${url}" />
-    <button onclick="setSrc(document.getElementById('searchfield').value)">Go</button>
-    <button onclick="fllscrn()">Fullscreen Webpage</button>
+  <div id="page">
+    <center>
+      <object id="frame" type="text/html" data="https://sugarylettuce49.github.io/SuperSearcher/wow.html" width="95%" height="95%" style="border:none; padding: 1px; border-radius: 8px;"></object>
+      <br>
+      <button onclick="document.getElementById('frame').setAttribute('data','https://sugarylettuce49.github.io/SuperSearcher/wow.html');" style="border-radius: 4px; width:10%">Home</button>
+      <button onclick="toolsMenu();" style="border-radius: 4px; width:10%">Tools</button>
+      <input type="text" id="searchfield" style="border-radius: 4px; width:50%" value="https://">
+      <button onclick="search()" style="border-radius: 4px; width:5%">Go</button>
+      <button onclick="fllscrn()" style="border-radius: 4px; width:18%">Fullscreen Webpage</button>
+    </center>
   </div>
-</div>
 </body>
-</html>
-    `;
+</html>`;
 
-    newWindow.document.write(injectedHTML);
-    newWindow.document.close();
-  }
-
-  document.getElementById('injectBtn').addEventListener('click', () => {
-    const url = document.getElementById('urlInput').value.trim();
-    injectSupersearcher(url);
-  });
-</script>
+      doc.open();
+      doc.write(htmlContent);
+      doc.close();
+    }
+  </script>
 </body>
 </html>
