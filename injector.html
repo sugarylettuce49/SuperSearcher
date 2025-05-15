@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supersearcher Injector</title>
+</head>
+<body>
+    <h2>Inject Supersearcher</h2>
+    <input type="text" id="targetURL" placeholder="Enter a URL or leave blank for about:blank" style="width: 60%;" value="about:blank">
+    <button onclick="launchSupersearcher()">Inject</button>
+
+    <script>
+        function launchSupersearcher() {
+            const targetURL = document.getElementById('targetURL').value || 'about:blank';
+            const win = window.open(targetURL);
+
+            const scriptContent = `
+                document.body.innerHTML = '';
+                document.head.innerHTML = '';
+                
+                const title = document.createElement('title');
+                title.textContent = 'Supersearcher Local';
+                document.head.appendChild(title);
+                
+                const base = document.createElement('base');
+                base.target = '_parent';
+                document.head.appendChild(base);
+                
+                const script = document.createElement('script');
+                script.textContent = \`
+                    document.getElementById("page").requestFullscreen();
+                    function fllscrn() {
+                        document.getElementById("page").requestFullscreen();
+                    }
+                    function search() {
+                        document.getElementById('frame').src = document.getElementById("searchfield").value;
+                    }
+                    function newWin() {
+                        const w = window.open();
+                        w.document.body.innerHTML = '<iframe allowfullscreen src="assets/wow.html" width="100%" height="100%" style="border:none;" id="frame">';
+                    }
+                    function toolsMenu() {
+                        var option = prompt("Select an option\\\\n1: Show info\\\\n2: Use local wow page");
+                        if (option == "1") {
+                            alert("Version info: Super Searcher 2.5\\\\nBundled WOW version: 2.5\\\\nBy default, the wow page comes from an online source which is dynamically updated.");
+                        } else if (option == "2") {
+                            document.getElementById('frame').src = 'assets/wow.html';
+                        } else {
+                            alert("Invalid option");
+                        }
+                    }
+                \`;
+                document.head.appendChild(script);
+                
+                const pageDiv = document.createElement('div');
+                pageDiv.id = 'page';
+                document.body.appendChild(pageDiv);
+                
+                const center = document.createElement('center');
+                pageDiv.appendChild(center);
+                
+                const iframe = document.createElement('iframe');
+                iframe.allowFullscreen = true;
+                iframe.src = 'https://sugarylettuce49.github.io/SuperSearcher/wow.html';
+                iframe.width = '95%';
+                iframe.height = '95%';
+                iframe.style.border = 'none';
+                iframe.style.padding = '1px';
+                iframe.style.borderRadius = '8px';
+                iframe.id = 'frame';
+                center.appendChild(iframe);
+                
+                center.appendChild(document.createElement('br'));
+                
+                const homeButton = document.createElement('button');
+                homeButton.textContent = 'Home';
+                homeButton.onclick = () => {
+                    document.getElementById('frame').src = 'https://sugarylettuce49.github.io/SuperSearcher/wow.html';
+                };
+                homeButton.style.borderRadius = '4px';
+                homeButton.style.width = '10%';
+                center.appendChild(homeButton);
+                
+                const toolsButton = document.createElement('button');
+                toolsButton.textContent = 'Tools';
+                toolsButton.onclick = () => toolsMenu();
+                toolsButton.style.borderRadius = '4px';
+                toolsButton.style.width = '10%';
+                center.appendChild(toolsButton);
+                
+                const searchInput = document.createElement('input');
+                searchInput.type = 'text';
+                searchInput.id = 'searchfield';
+                searchInput.value = 'https://';
+                searchInput.style.borderRadius = '4px';
+                searchInput.style.width = '50%';
+                center.appendChild(searchInput);
+                
+                const goButton = document.createElement('button');
+                goButton.textContent = 'Go';
+                goButton.onclick = () => search();
+                goButton.style.borderRadius = '4px';
+                goButton.style.width = '5%';
+                center.appendChild(goButton);
+                
+                const fsButton = document.createElement('button');
+                fsButton.textContent = 'Fullscreen Webpage';
+                fsButton.onclick = () => fllscrn();
+                fsButton.style.borderRadius = '4px';
+                fsButton.style.width = '18%';
+                center.appendChild(fsButton);
+            `;
+
+            // Wait until the new window is ready
+            win.onload = () => {
+                const injectedScript = win.document.createElement('script');
+                injectedScript.textContent = scriptContent;
+                win.document.head.appendChild(injectedScript);
+            };
+        }
+    </script>
+</body>
+</html>
