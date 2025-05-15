@@ -22,6 +22,32 @@
 <head>
     <title>Supersearcher Local</title>
     <base target="_parent">
+    <style>
+        html, body, #page {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        iframe#frame {
+            height: 95vh;
+            width: 95vw;
+            border: none;
+            padding: 1px;
+            border-radius: 8px;
+        }
+        button, input {
+            border-radius: 4px;
+        }
+        input#searchfield {
+            width: 50vw;
+        }
+    </style>
     <script>
         function fllscrn() {
             document.getElementById("page").requestFullscreen();
@@ -51,18 +77,19 @@
 <body>
     <div id="page">
         <center>
-            <iframe allowfullscreen src="https://sugarylettuce49.github.io/SuperSearcher/wow.html" width="95%" height="95%" style="border:none; padding: 1px; border-radius: 8px;" id="frame"></iframe>
-            <br>
-            <button onclick="document.getElementById('frame').src = 'https://sugarylettuce49.github.io/SuperSearcher/wow.html'" style="border-radius: 4px; width:10%">Home</button>
-            <button onclick="toolsMenu();" style="border-radius: 4px; width:10%">Tools</button>
-            <input type="text" id="searchfield" style="border-radius: 4px; width:50%" value="https://">
-            <button onclick="search()" style="border-radius: 4px; width:5%">Go</button>
-            <button onclick="fllscrn()" style="border-radius: 4px; width:18%">Fullscreen Webpage</button>
+            <iframe allowfullscreen src="https://sugarylettuce49.github.io/SuperSearcher/wow.html" id="frame"></iframe>
+            <div>
+                <button onclick="document.getElementById('frame').src = 'https://sugarylettuce49.github.io/SuperSearcher/wow.html'" style="width:10%">Home</button>
+                <button onclick="toolsMenu()" style="width:10%">Tools</button>
+                <input type="text" id="searchfield" value="https://" />
+                <button onclick="search()" style="width:5%">Go</button>
+                <button onclick="fllscrn()" style="width:18%">Fullscreen Webpage</button>
+            </div>
         </center>
     </div>
 </body>
 </html>
-            `;
+`;
 
             win.document.open();
             win.document.write(htmlContent);
